@@ -23,7 +23,6 @@ def download_tweets(db, user, num=20):
 
 
 if __name__ == '__main__':
-	db = Connection(
-	    'mongodb://test:test@paulo.mongohq.com:10063/TweetCat').TweetCat
-    download_tweets(db, 'ESPN')
-    print get_tweets(db, classn='ESPN')
+    db = Connection('mongodb://test:test@paulo.mongohq.com:10063/TweetCat').TweetCat
+    download_tweets(db,'ESPN')
+    print get_tweets(db,classn='ESPN')
