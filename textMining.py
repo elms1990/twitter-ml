@@ -1,41 +1,45 @@
 """ Script de text mining """
-from twitter_test import get_tweets_text
+import twitter_test
 from nltk.tokenize import word_tokenize, sent_tokenize
 from nltk.corpus import stopwords
 from nltk.stem.snowball import EnglishStemmer
 import string
 
-#tweet = "RT Arsenal's got their swagger back. The Gunners just qualified qualify for the Champions League Group Stage for the 16th straight year. @nba_nbb #victory"
+category = 'sport'
 
 # tokenizeTweet(tweet) receives a string representing the tweet and parses it into tokens
 # stemming them as possible. Discard @users but saves #hashtags 
 # in: tweet = str
 # out: list[str]
-
-# Note: it does not consider hashtags. '#bla' is treated as 'bla', '@nba' is treated as 'nba'
 def tokenizeTweet(tweet):
     allWords = [word.lower() for sentence in sent_tokenize(tweet)
                 for word in word_tokenize(sentence)]
 
-    #deletes @users and RT and saves #hashtags
+    #deletes @users, RT and URLs and saves #hashtags
     nWords, i = len(allWords), 0
     hashtags = []
     while i < nWords:
-        if allWords[i] == '@':
+        if allWords[i] == '@':      # @users
             allWords[i:i+2] = []
             nWords-=2
-        elif allWords[i] == 'rt':
+        elif allWords[i] == 'rt':   # delete RT
             allWords[i:i+1] = []
             nWords-=1
-        elif allWords[i] == '#':
+        elif allWords[i] == '#':    # save the hashtag
             hashtags.append(allWords[i+1])
             allWords[i:i+2] = []
             nWords-=2
+        elif allWords[i] == "http":     # delete url starting with http:
+            allWords[i:i+3] = []
+            nWords-=3
+        elif allWords[i][0:3] == 'www': # delete urls starting with www.
+            allWords[i:i+1] = []
+            nWords-=1
         else:
             i+=1
 
     possibleWords = filter(lambda x: x not in stopwords.words(
-        'english') and x not in string.punctuation, allWords)
+        'english') and x not in string.punctuation and x.isdigit() == False, allWords)
 
     stemmer = EnglishStemmer()
     tokens = []
@@ -45,11 +49,20 @@ def tokenizeTweet(tweet):
         tokens.append('#'+tag)
     return tokens
 
-## Work In Progress
-def buildDictionary():
-    tweetList = [each.encode('ascii','ignore') for each in get_tweets_text()]
-    print tweetList
+# buildDictionary() creates the dictionary from the tokens of each tweet from a given <category>
+# if <category> is empty, creates the dictionary from all tweets
+# in: category = str
+# out: set()
+def buildDictionary(category):
+    tweetList = twitter_test.get_tweets_text(classn=category)
+    dictionary = set()
+    for tweet in tweetList:
+        dictionary = dictionary.union(set(tokenizeTweet(tweet)))
+    return dictionary
 
 
 if __name__ == '__main__':
-    buildDictionary()
+    print buildDictionary(category)
+
+
+   
