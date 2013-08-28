@@ -14,7 +14,7 @@ def get_tweets_text(**kwargs):
 
 
 def download_tweets(user, num=20):
-    db.tweets.remove()
+    #db.tweets.remove()
 
     APP_KEY = 'CVP4Tgh3FZahPl6wVSf6NQ'
     APP_SECRET = 'aYbYRnYjbtDzJjTWsqjp10vKbxzSrB46CnuQtwZMI'
@@ -28,7 +28,7 @@ def download_tweets(user, num=20):
         r = twitter.get_user_timeline(screen_name=user, count=200, page=i)
         for x in r:
             db.tweets.save(
-                {'_id': x['id_str'], 'classn': user, 'text': x['text']})
+                {'_id': x['id_str'], 'classn': 'sport', 'text': x['text'].encode('ascii', 'ignore'), 'user': user})
         if len(r) == 0:
             break
         else:
@@ -39,5 +39,8 @@ def download_tweets(user, num=20):
 
 
 if __name__ == '__main__':
+    download_tweets('SkySports')
+    download_tweets('BBCSport')
     download_tweets('ESPN')
+
     print len(get_tweets_text())
