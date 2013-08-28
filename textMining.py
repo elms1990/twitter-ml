@@ -8,7 +8,7 @@ import string
 category = 'sport'
 
 # tokenizeTweet(tweet) receives a string representing the tweet and parses it into tokens
-# stemming them as possible. Discard @users but saves #hashtags 
+# stemming them as possible. Discard @users and urls but saves #hashtags 
 # in: tweet = str
 # out: list[str]
 def tokenizeTweet(tweet):
@@ -26,9 +26,13 @@ def tokenizeTweet(tweet):
             allWords[i:i+1] = []
             nWords-=1
         elif allWords[i] == '#':    # save the hashtag
-            hashtags.append(allWords[i+1])
-            allWords[i:i+2] = []
-            nWords-=2
+            try:
+                hashtags.append(allWords[i+1])
+                allWords[i:i+2] = []
+                nWords-=2
+            except:
+                allWords[i:i+1] = []
+                nWords-=1
         elif allWords[i] == "http":     # delete url starting with http:
             allWords[i:i+3] = []
             nWords-=3
@@ -62,7 +66,8 @@ def buildDictionary(category):
 
 
 if __name__ == '__main__':
-    print buildDictionary(category)
+    dictonary = buildDictionary(category)
+    print len(dictonary)
 
 
    
