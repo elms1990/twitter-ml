@@ -23,18 +23,19 @@ def download_tweets(user, num=20):
 
     twitter = Twython(APP_KEY, APP_SECRET, OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
     i = 0
+    total = 0
     while True:
-        #r = twitter.get_user_timeline(screen_name=user)
         r = twitter.get_user_timeline(screen_name=user, count=200, page=i)
-        if len(r) == 0:
-            break
         for x in r:
             db.tweets.save(
                 {'_id': x['id_str'], 'classn': user, 'text': x['text']})
-
+        if len(r) == 0:
+            break
         else:
             i += 1
-        print 'saved %s tweets' % (i * 200)
+            total += len(r)
+
+        print 'saved %s tweets' % total
 
 
 if __name__ == '__main__':
