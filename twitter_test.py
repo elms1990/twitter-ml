@@ -22,13 +22,22 @@ def download_tweets(user, num=20):
     OAUTH_TOKEN_SECRET = 'BoihAhEBpydRZJGB5RsUPTPrKTxTzW3Fejr88MFl0'
 
     twitter = Twython(APP_KEY, APP_SECRET, OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
+    i = 0
+    total = 0
+    while True:
+        r = twitter.get_user_timeline(screen_name=user, count=200, page=i)
+        for x in r:
+            db.tweets.save(
+                {'_id': x['id_str'], 'classn': user, 'text': x['text']})
+        if len(r) == 0:
+            break
+        else:
+            i += 1
+            total += len(r)
 
-    r = twitter.get_user_timeline(screen_name=user)
-
-    for x in r:
-        db.tweets.save({'_id': x['id_str'], 'classn': user, 'text': x['text']})
+        print 'saved %s tweets' % total
 
 
 if __name__ == '__main__':
     download_tweets('ESPN')
-    print get_tweets_text(classn='ESPN')
+    print len(get_tweets_text())
