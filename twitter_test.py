@@ -1,12 +1,19 @@
 from twython import Twython
 from pymongo import Connection
 
+db = Connection(
+    'mongodb://test:test@paulo.mongohq.com:10063/TweetCat').TweetCat
 
-def get_tweets(db, **kwargs):
+
+def get_tweets(**kwargs):
     return [x for x in db.tweets.find(kwargs)]
 
 
-def download_tweets(db, user, num=20):
+def get_tweets_text(**kwargs):
+    return [x['text'] for x in db.tweets.find(kwargs)]
+
+
+def download_tweets(user, num=20):
     db.tweets.remove()
 
     APP_KEY = 'CVP4Tgh3FZahPl6wVSf6NQ'
@@ -23,6 +30,5 @@ def download_tweets(db, user, num=20):
 
 
 if __name__ == '__main__':
-    db = Connection('mongodb://test:test@paulo.mongohq.com:10063/TweetCat').TweetCat
-    download_tweets(db,'ESPN')
-    print get_tweets(db,classn='ESPN')
+    download_tweets('ESPN')
+    print get_tweets_text(classn='ESPN')
