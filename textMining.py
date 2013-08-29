@@ -6,7 +6,7 @@ from nltk.probability import FreqDist
 from nltk.stem.snowball import EnglishStemmer
 import string
 
-categoryList = ['sport','tech']
+categoryList = ['sport']
 objCategory = ['sport']
 restCategory = [x for x in categoryList if x not in objCategory]
 ourStopWords = [
