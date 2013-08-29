@@ -6,10 +6,12 @@ from nltk.probability import FreqDist
 from nltk.stem.snowball import EnglishStemmer
 import string
 
-category = 'sport'
+categoryList = ['sport','tech']
+objCategory = ['sport']
+restCategory = [x for x in categoryList if x not in objCategory]
 ourStopWords = [
     "'s", "n't", "''", "...", "``", "gt", "lt", "quot", "amp", "oelig", "scaron", "tilde", "ensp", "emsp",
-    "zwnj", "zwj", "lrm", "rlm", "ndash", "mdash", "ldquo", "rdquo", "lsquo", "rsquo", "sbquo", "bdquo", "lsaquo", "rsaquo"]
+    "zwnj", "zwj", "lrm", "rlm", "ndash", "mdash", "ldquo", "rdquo", "lsquo", "rsquo", "sbquo", "bdquo", "lsaquo", "rsaquo","--"]
 #ListaTweet = ["It was a great game yesterday! Kobe Bryant was a beast!!!","Kobe Bryant was awesome in yesterday's game! GO LAKERS", "Go Lakers, go lakers!"]
 
 # tokenizeTweet(tweet) receives a string representing the tweet and parses it into tokens
@@ -61,13 +63,10 @@ def tokenizeTweet(tweet):
     return tokens
 
 # buildDictionary() creates the dictionary from the <nWords> most frequently tokens of the tweets from a given <category>
-# if <category> is None, creates the dictionary from all tweets
 # if <nWords> is empty, nWords = None
-# in: category = str, nWords = int
+# in: nWords = int
 # out: set()
-
-
-def buildDictionary(category=None, nWords=None):
+def buildCategoryDictionary(category='',nWords=None):
     tweetList = twitter_test.get_tweets_text(classn=category)
     freq = FreqDist()
 
@@ -80,11 +79,15 @@ def buildDictionary(category=None, nWords=None):
     dictionary = set(freq.keys()[:nWords])
     return dictionary
 
+def buildWholeDictionary(mainCategoryList,secCategoriList,nWords=None):
+    dictionary = set()
+    for category in mainCategoryList + secCategoriList:
+        dictionary = dictionary.union(buildCategoryDictionary(category,nWords))
+    return dictionary
+
 # saveDictionaryToFile() saves a dictionary into a file, one token in each line
 # in: dictionary = set(str), dictFilePath = str
 # out: None
-
-
 def saveDictionaryToFile(dictionary, dictFilePath):
     with open(dictFilePath, "w") as f:
         for token in dictionary:
@@ -93,8 +96,6 @@ def saveDictionaryToFile(dictionary, dictFilePath):
 # readDictionaryFromFile() reads the <dictFilePath> file and saves the tokens into a set
 # in: dictFilePath = srt
 # out: dictionary = set(str)
-
-
 def readDictionaryFromFile(dictFilePath):
     with open(dictFilePath, "r") as f:
         lines = f.readlines()
@@ -107,7 +108,8 @@ def describeFeaturesFromTweet(dictionary, tweet):
     pass
 
 if __name__ == '__main__':
-    dictionary = buildDictionary(category, 100)
+    #dictionary = buildCategoryDictionary('tech', 100)
+    dictionary = buildWholeDictionary(objCategory,restCategory,100)
     saveDictionaryToFile(dictionary, "dict.txt")
    # dictionary = readDictionaryFromFile("dict.txt")
     # print dictionary
