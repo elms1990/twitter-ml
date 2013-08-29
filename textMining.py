@@ -108,9 +108,10 @@ def describeFeaturesFromTweet(dictionary, tweet):
     pass
 
 if __name__ == '__main__':
-    #dictionary = buildCategoryDictionary('tech', 100)
+   #dictionary = buildCategoryDictionary('tech', 100)
+   
     dictionary = buildWholeDictionary(objCategory,restCategory,100)
     saveDictionaryToFile(dictionary, "dict.txt")
    # dictionary = readDictionaryFromFile("dict.txt")
-    # print dictionary
-    # print 'great' in dictionary
+   # print dictionary
+   # print 'great' in dictionary
