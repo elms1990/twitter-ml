@@ -14,8 +14,6 @@ def get_tweets_text(**kwargs):
 
 
 def download_tweets(accs, num=20):
-    #db.tweets.remove()
-
     APP_KEY = 'CVP4Tgh3FZahPl6wVSf6NQ'
     APP_SECRET = 'aYbYRnYjbtDzJjTWsqjp10vKbxzSrB46CnuQtwZMI'
     OAUTH_TOKEN = '76013996-9XJdUtMi78dQ3OiFIBuXqziNDVwBK6B1noh4eUu5w'
@@ -23,13 +21,17 @@ def download_tweets(accs, num=20):
 
     twitter = Twython(APP_KEY, APP_SECRET, OAUTH_TOKEN, OAUTH_TOKEN_SECRET)
     for acc in accs:
-        i = 0
+        i = 1
         total = 0
+        lastweet =  db.tweets.find_one({'user': acc['user']})
+        lastweet = lastweet['_id'] if lastweet else 1
+        print "LASTWTEET",acc['user'],lastweet
         while True:
-            r = twitter.get_user_timeline(screen_name=acc['user'], count=200, page=i)
+            r = twitter.get_user_timeline(
+                screen_name=acc['user'], count=200, page=i, since_id=lastweet)
             for x in r:
                 db.tweets.save(
-                    {'_id': x['id_str'], 'classn': acc['cat'], 'text': x['text'].encode('ascii', 'ignore'), 'user': acc['user']})
+                    {'_id': x['id'], 'classn': acc['cat'], 'text': x['text'].encode('ascii', 'ignore'), 'user': acc['user']})
             if len(r) == 0:
                 break
             else:
@@ -42,15 +44,14 @@ def download_tweets(accs, num=20):
 
 if __name__ == '__main__':
     download_tweets([
-        {'user':'ESPN', 'cat':'sports'},
-        {'user':'SkySports', 'cat': 'sports'},
-        {'user':'BBCSport', 'cat':'sports'},
-        {'user':'FOXSports', 'cat':'sports'},
-        {'user':'Gizmodo', 'cat':'tech'}, 
-        {'user':'CNET', 'cat':'tech'},
-        {'user': 'google', 'cat':'tech'},
-        {'user': 'BBBCTech', 'cat':'tech'}
-        ])
-
+        {'user': 'ESPN', 'cat': 'sports'},
+        {'user': 'SkySports', 'cat': 'sports'},
+        {'user': 'BBCSport', 'cat': 'sports'},
+        {'user': 'FOXSports', 'cat': 'sports'},
+        {'user': 'Gizmodo', 'cat': 'tech'},
+        {'user': 'CNET', 'cat': 'tech'},
+        {'user': 'google', 'cat': 'tech'},
+        {'user': 'BBCTech', 'cat': 'tech'}
+    ])
 
     print len(get_tweets_text())
