@@ -102,11 +102,34 @@ def readDictionaryFromFile(dictFilePath):
     dictionary = set(tokens.strip() for tokens in lines)
     return dictionary
 
+# extractFeaturesFromTweet() extracts the features of a given tweet using the dictionary
+# in: dictionary = set(), tweet = str
+# out: features = dictionary where features[token] = True if token appears in tweet
+def extractFeaturesFromTweet(dictionary, tweet, category):
+    tokens = tokenizeTweet(tweet)
+    features = {}
+    for eachToken in tokens:
+        if eachToken in dictionary:
+            features[eachToken] = True
+    features['class'] = category
+    return features
 
-def describeFeaturesFromTweet(dictionary, tweet):
+def extractFeaturesFromAllTweets(dictionary, mainCategoryList,secCategoriList):
+    mainClassFeatures = []
+    secClassFeatures = []
+    for category in mainCategoryList:
+        tweetList = twitter_test.get_tweets_text(classn=category)
+        for tweet in tweetList:
+            mainClassFeatures.append(extractFeaturesFromTweet(dictionary,tweet,category))
+    for category in secCategoryList:
+        tweetList = twitter_test.get_tweets_text(classn=category)
+        for tweet in tweetList:
+            secClassFeatures.append(extractFeaturesFromTweet(dictionary,tweet,category))
 
-    pass
-
+    """ IMPLEMENTAR O qUE faZER COM A LISTA DOS FEATURES: 
+        ESCREVER NUM ArQUIVO, OU GUARdar NO banCO de dados
+    """
+    
 if __name__ == '__main__':
    #dictionary = buildCategoryDictionary('tech', 100)
    
