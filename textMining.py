@@ -12,6 +12,8 @@ restCategory = [x for x in categoryList if x not in objCategory]
 ourStopWords = [
     "'s", "n't", "''", "...", "``", "gt", "lt", "quot", "amp", "oelig", "scaron", "tilde", "ensp", "emsp",
     "zwnj", "zwj", "lrm", "rlm", "ndash", "mdash", "ldquo", "rdquo", "lsquo", "rsquo", "sbquo", "bdquo", "lsaquo", "rsaquo","--"]
+ourStopWords+= stopwords.words('english') + list(string.punctuation)
+ourStopWords = set(ourStopWords)
 #ListaTweet = ["It was a great game yesterday! Kobe Bryant was a beast!!!","Kobe Bryant was awesome in yesterday's game! GO LAKERS", "Go Lakers, go lakers!"]
 
 # tokenizeTweet(tweet) receives a string representing the tweet and parses it into tokens
@@ -21,8 +23,7 @@ ourStopWords = [
 
 
 def tokenizeTweet(tweet):
-    allWords = [word.lower() for sentence in sent_tokenize(tweet)
-                for word in word_tokenize(sentence)]
+    allWords = [word.lower() for word in word_tokenize(tweet)]
 
     # deletes @users, RT and URLs and saves #hashtags
     nWords, i = len(allWords), 0
@@ -51,8 +52,7 @@ def tokenizeTweet(tweet):
         else:
             i += 1
 
-    possibleWords = filter(lambda x: x not in stopwords.words(
-        'english') and x not in string.punctuation and x not in ourStopWords and x.isdigit() == False, allWords)
+    possibleWords = filter(lambda x: x not in ourStopWords and x.isdigit() == False, allWords)
 
     stemmer = EnglishStemmer()
     tokens = []
