@@ -4,9 +4,12 @@ from nltk.tokenize import word_tokenize, sent_tokenize
 from nltk.corpus import stopwords
 from nltk.probability import FreqDist
 from nltk.stem.snowball import EnglishStemmer
+from Queue import Queue
+import threading
 import string
 
-categoryList = ['sport','tech']
+
+categoryList = ['sport']
 objCategory = ['sport']
 restCategory = [x for x in categoryList if x not in objCategory]
 ourStopWords = [
@@ -18,49 +21,64 @@ ourStopWords = [
 # stemming them as possible. Discard @users and urls but saves #hashtags
 # in: tweet = str
 # out: list[str]
+q_token = Queue()
+q_freq = Queue()
+
+def freq_update(freq):
+    while True:
+        tokens = q_freq.get()
+       # print tokens
+        freq.update(word for word in tokens)
+        q_freq.task_done()
 
 
-def tokenizeTweet(tweet):
-    allWords = [word.lower() for sentence in sent_tokenize(tweet)
-                for word in word_tokenize(sentence)]
 
-    # deletes @users, RT and URLs and saves #hashtags
-    nWords, i = len(allWords), 0
-    hashtags = []
-    while i < nWords:
-        if allWords[i] == '@':      # @users
-            allWords[i:i + 2] = []
-            nWords -= 2
-        elif allWords[i] == 'rt':   # delete RT
-            allWords[i:i + 1] = []
-            nWords -= 1
-        elif allWords[i] == '#':    # save the hashtag
-            try:
-                hashtags.append(allWords[i + 1])
+def tokenizeTweet():
+    while True:
+
+        tweet = q_token.get()
+        allWords = [word.lower() for sentence in sent_tokenize(tweet)
+                    for word in word_tokenize(sentence)]
+
+        # deletes @users, RT and URLs and saves #hashtags
+        nWords, i = len(allWords), 0
+        hashtags = []
+        while i < nWords:
+            if allWords[i] == '@':      # @users
                 allWords[i:i + 2] = []
                 nWords -= 2
-            except:
+            elif allWords[i] == 'rt':   # delete RT
                 allWords[i:i + 1] = []
                 nWords -= 1
-        elif allWords[i] == "http":     # delete url starting with http:
-            allWords[i:i + 3] = []
-            nWords -= 3
-        elif allWords[i][0:3] == 'www':  # delete urls starting with www.
-            allWords[i:i + 1] = []
-            nWords -= 1
-        else:
-            i += 1
+            elif allWords[i] == '#':    # save the hashtag
+                try:
+                    hashtags.append(allWords[i + 1])
+                    allWords[i:i + 2] = []
+                    nWords -= 2
+                except:
+                    allWords[i:i + 1] = []
+                    nWords -= 1
+            elif allWords[i] == "http":     # delete url starting with http:
+                allWords[i:i + 3] = []
+                nWords -= 3
+            elif allWords[i][0:3] == 'www':  # delete urls starting with www.
+                allWords[i:i + 1] = []
+                nWords -= 1
+            else:
+                i += 1
 
-    possibleWords = filter(lambda x: x not in stopwords.words(
-        'english') and x not in string.punctuation and x not in ourStopWords and x.isdigit() == False, allWords)
+        possibleWords = filter(lambda x: x not in stopwords.words(
+            'english') and x not in string.punctuation and x not in ourStopWords and x.isdigit() == False, allWords)
 
-    stemmer = EnglishStemmer()
-    tokens = []
-    for word in possibleWords:
-        tokens.append(str(stemmer.stem(word)))
-    for tag in hashtags:
-        tokens.append('#' + tag)
-    return tokens
+        stemmer = EnglishStemmer()
+        tokens = []
+        for word in possibleWords:
+            tokens.append(str(stemmer.stem(word)))
+        for tag in hashtags:
+            tokens.append('#' + tag)
+
+        q_freq.put(tokens)
+        q_token.task_done()
 
 # buildDictionary() creates the dictionary from the <nWords> most frequently tokens of the tweets from a given <category>
 # if <nWords> is empty, nWords = None
@@ -70,8 +88,22 @@ def buildCategoryDictionary(category='',nWords=None):
     tweetList = twitter_test.get_tweets_text(classn=category)
     freq = FreqDist()
 
+    for i in range(2):
+        t = threading.Thread(target=tokenizeTweet)
+        t.setDaemon(True)
+        t.start()
+    
     for tweet in tweetList:
-        freq.update(word for word in tokenizeTweet(tweet))
+        q_token.put(tweet)
+
+    for i in range(10):
+        t = threading.Thread(target=freq_update, args=(freq,))
+        t.setDaemon(True)
+        t.start()
+
+    q_token.join()
+    print 'waiting for freq to update ..'
+    q_freq.join()
 
     print freq.keys()[:10]
     print freq.values()[:10]
