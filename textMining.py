@@ -1,5 +1,5 @@
 """ Script de text mining """
-#import twitter_test
+import twitter_test
 from nltk.tokenize import word_tokenize, sent_tokenize
 from nltk.corpus import stopwords
 from nltk.probability import FreqDist
@@ -7,7 +7,10 @@ from nltk.stem.snowball import EnglishStemmer
 import string
 
 category = 'sport'
-ListaTweet = ["It was a great game yesterday! Kobe Bryant was a beast!!!","Kobe Bryant was awesome in yesterday's game! GO LAKERS", "Go Lakers, go lakers!"]
+ourStopWords = [
+    "'s", "n't", "''", "...", "``", "gt", "lt", "quot", "amp", "oelig", "scaron", "tilde", "ensp", "emsp",
+    "zwnj", "zwj", "lrm", "rlm", "ndash", "mdash", "ldquo", "rdquo", "lsquo", "rsquo", "sbquo", "bdquo", "lsaquo", "rsaquo"]
+#ListaTweet = ["It was a great game yesterday! Kobe Bryant was a beast!!!","Kobe Bryant was awesome in yesterday's game! GO LAKERS", "Go Lakers, go lakers!"]
 
 # tokenizeTweet(tweet) receives a string representing the tweet and parses it into tokens
 # stemming them as possible. Discard @users and urls but saves #hashtags
@@ -47,7 +50,7 @@ def tokenizeTweet(tweet):
             i += 1
 
     possibleWords = filter(lambda x: x not in stopwords.words(
-        'english') and x not in string.punctuation and x.isdigit() == False, allWords)
+        'english') and x not in string.punctuation and x not in ourStopWords and x.isdigit() == False, allWords)
 
     stemmer = EnglishStemmer()
     tokens = []
@@ -62,9 +65,10 @@ def tokenizeTweet(tweet):
 # if <nWords> is empty, nWords = None
 # in: category = str, nWords = int
 # out: set()
-def buildDictionary(category = None, nWords = None):
-    #tweetList = twitter_test.get_tweets_text(classn=category)
-    tweetList = ListaTweet
+
+
+def buildDictionary(category=None, nWords=None):
+    tweetList = twitter_test.get_tweets_text(classn=category)
     freq = FreqDist()
 
     for tweet in tweetList:
@@ -79,23 +83,32 @@ def buildDictionary(category = None, nWords = None):
 # saveDictionaryToFile() saves a dictionary into a file, one token in each line
 # in: dictionary = set(str), dictFilePath = str
 # out: None
+
+
 def saveDictionaryToFile(dictionary, dictFilePath):
-    with open(dictFilePath,"w") as f:
+    with open(dictFilePath, "w") as f:
         for token in dictionary:
-            f.write(token+"\n")
+            f.write(token + "\n")
 
 # readDictionaryFromFile() reads the <dictFilePath> file and saves the tokens into a set
 # in: dictFilePath = srt
 # out: dictionary = set(str)
+
+
 def readDictionaryFromFile(dictFilePath):
-    with open(dictFilePath,"r") as f:
+    with open(dictFilePath, "r") as f:
         lines = f.readlines()
     dictionary = set(tokens.strip() for tokens in lines)
     return dictionary
 
+
+def describeFeaturesFromTweet(dictionary, tweet):
+
+    pass
+
 if __name__ == '__main__':
-    dictionary = buildDictionary()
-    saveDictionaryToFile(dictionary,"dict.txt")
-    dictionary = readDictionaryFromFile("dict.txt")
-    print dictionary
-    print 'great' in dictionary
+    dictionary = buildDictionary(category, 100)
+    saveDictionaryToFile(dictionary, "dict.txt")
+   # dictionary = readDictionaryFromFile("dict.txt")
+    # print dictionary
+    # print 'great' in dictionary
