@@ -8,6 +8,7 @@ db = Connection(
 # returns only newly downloaded tweets that fit params, sets them to old
 # afterwards
 def get_new_tweets(**kwargs):
+    download_tweets()
     kwargs.update({'new': True})
     y = []
     for x in db.tweets.find(kwargs):
@@ -68,4 +69,4 @@ if __name__ == '__main__':
     # 'cat':NOMEDACATEGORIA})
     download_tweets()
     print "NEW:", len(get_new_tweets()), "TOTAL:", db.tweets.count()
-    # 25798
+    # 25801
