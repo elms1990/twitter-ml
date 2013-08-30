@@ -5,6 +5,10 @@ db = Connection(
     'mongodb://test:test@paulo.mongohq.com:10063/TweetCat').TweetCat
 
 
+
+def count_new_tweets():
+    return db.tweets.find({'new':True}).count()
+
 # returns only newly downloaded tweets that fit params, sets them to old
 # afterwards
 def get_new_tweets(**kwargs):
@@ -68,5 +72,5 @@ if __name__ == '__main__':
     # para adicionar novas contas rodar: db.accounts.save({'user':NOMEDACONTA,
     # 'cat':NOMEDACATEGORIA})
     download_tweets()
-    print "NEW:", len(get_new_tweets()), "TOTAL:", db.tweets.count()
+    print "NEW:", count_new_tweets(), "TOTAL:", db.tweets.count()
     # 25801
