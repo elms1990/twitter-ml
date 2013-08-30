@@ -96,8 +96,8 @@ def updateCategoryDictionary(category,nWords=None):
     for tweet in tweetList:
         freq.update(word for word in tokenizeTweet(tweet))
 
-    # print freq.keys()[:10]
-    # print freq.values()[:10]
+    print freq.keys()[:10]
+    print freq.values()[:10]
 
     try:
         oldDict = readDictionaryFromFile(category+categoryDictFilePath)
