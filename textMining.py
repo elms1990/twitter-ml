@@ -69,17 +69,54 @@ def tokenizeTweet(tweet):
 def buildCategoryDictionary(category,nWords=None):
     tweetList = twitter_test.get_tweets_text(classn=category)
     freq = FreqDist()
-
+    tmpDict = FreqDist()
     for tweet in tweetList:
         freq.update(word for word in tokenizeTweet(tweet))
 
     print freq.keys()[:10]
     print freq.values()[:10]
 
-    tmpDict = freq.items()[:nWords]
-
+    if nWords != None:
+        i = 0
+        for (token,frequency) in freq.iteritems():
+            tmpDict[token] = frequency
+            i+=1
+            if i == nWords:
+                break
+    else:
+        tmpDict = freq
     saveDictionaryToFile(tmpDict,category+categoryDictFilePath)
-    return dict(tmpDict)
+    return tmpDict
+
+def updateCategoryDictionary(category,nWords=None):
+    tweetList = twitter_test.get_new_tweets(classn=category)
+    freq = FreqDist()
+    tmpDict = FreqDist()
+
+    for tweet in tweetList:
+        freq.update(word for word in tokenizeTweet(tweet))
+
+    # print freq.keys()[:10]
+    # print freq.values()[:10]
+
+    try:
+        oldDict = readDictionaryFromFile(category+categoryDictFilePath)
+    except:
+        newDict = buildCategoryDictionary(category,nWords)
+        return newDict
+
+    oldDict.update(freq)
+    if nWords != None:
+        i = 0
+        for (token,frequency) in oldDict.iteritems():
+            tmpDict[token] = frequency
+            i+=1
+            if i == nWords:
+                break
+    else:
+        tmpDict = oldDict
+    saveDictionaryToFile(tmpDict,category+categoryDictFilePath)
+    return tmpDict
 
 def buildWholeDictionary(categoryList,nWords=None):
     dictList= []
@@ -94,14 +131,14 @@ def buildWholeDictionary(categoryList,nWords=None):
 # out: None
 def saveDictionaryToFile(dictionary, dictFilePath):
     with open(dictFilePath, "w") as f:
-        for (token,freq) in dictionary:
-            f.write(token + " " + str(freq) + "\n")
+        for token in dictionary:
+            f.write(token + " " + str(dictionary[token]) + "\n")
 
 # readDictionaryFromFile() reads the <dictFilePath> file and saves the tokens into a set
 # in: dictFilePath = srt
 # out: dictionary = set(str)
 def readDictionaryFromFile(dictFilePath):
-    dictionary = {}
+    dictionary = FreqDist()
     with open(dictFilePath, "r") as f:
         lines = f.readlines()
     for line in lines:
@@ -138,7 +175,8 @@ def extractFeaturesFromAllTweets(dictionary, mainCategoryList,secCategoriList):
     """
     
 if __name__ == '__main__':
-   #dictionary = buildCategoryDictionary('tech', 100)
+   dictionary = updateCategoryDictionary('sports')
    # dictionary = buildWholeDictionary(objCategory,restCategory,100)
-   dictionary = buildWholeDictionary(categoryList,100)
-   print dictionary
+   #dictionary = buildWholeDictionary(categoryList,100)
+   #print dictionary
+
