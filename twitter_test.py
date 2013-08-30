@@ -65,6 +65,8 @@ def download_tweets():
 
             print 'saved %s tweets from %s' % (total, acc['user'])
         print 'saved all tweets from: %s' % acc['user']
+    print "NEW:", count_new_tweets(), "TOTAL:", db.tweets.count()
+
 
 
 if __name__ == '__main__':
@@ -72,5 +74,4 @@ if __name__ == '__main__':
     # para adicionar novas contas rodar: db.accounts.save({'user':NOMEDACONTA,
     # 'cat':NOMEDACATEGORIA})
     download_tweets()
-    print "NEW:", count_new_tweets(), "TOTAL:", db.tweets.count()
     # 25801
