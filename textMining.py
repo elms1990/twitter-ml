@@ -155,24 +155,23 @@ def extractFeaturesFromTweet(dictionary, tweet, category):
     features['class'] = category
     return features
 
-def extractFeaturesFromAllTweets(dictionary, mainCategoryList,secCategoriList):
-    mainClassFeatures = []
-    secClassFeatures = []
-    for category in mainCategoryList:
+def extractFeaturesFromAllTweets(dictionary, categoryList):
+    classFeatures = []
+    for category in categoryList:
+        tmpList = []
         tweetList = twitter_test.get_tweets_text(classn=category)
         for tweet in tweetList:
-            mainClassFeatures.append(extractFeaturesFromTweet(dictionary,tweet,category))
-    for category in secCategoryList:
-        tweetList = twitter_test.get_tweets_text(classn=category)
-        for tweet in tweetList:
-            secClassFeatures.append(extractFeaturesFromTweet(dictionary,tweet,category))
+            tmpList.append(extractFeaturesFromTweet(dictionary,tweet,category))
+        classFeatures.append((tmpList,category))
 
-    """ IMPLEMENTAR O qUE faZER COM A LISTA DOS FEATURES: 
-        ESCREVER NUM ArQUIVO, OU GUARdar NO banCO de dados
-    """
+    
+    #for (featuresList, category) in classFeatures:
+    #   salvar em um arquivo com o nome 'category'_features.txt
+    #   salvar o numero de tweets len.(featuresList) como cabecalho
     
 if __name__ == '__main__':
-   dictionary = updateCategoryDictionary('sports')
+   dictionary = updateCategoryDictionary('sports',1000)
+   dictionary = updateCategoryDictionary('tech',1000)
    # dictionary = buildWholeDictionary(objCategory,restCategory,100)
    #dictionary = buildWholeDictionary(categoryList,100)
    #print dictionary
