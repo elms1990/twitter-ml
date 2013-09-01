@@ -73,8 +73,8 @@ def buildCategoryDictionary(category,nWords=None):
     for tweet in tweetList:
         freq.update(word for word in tokenizeTweet(tweet))
 
-    print freq.keys()[:10]
-    print freq.values()[:10]
+    # print freq.keys()[:10]
+    # print freq.values()[:10]
 
     if nWords != None:
         i = 0
@@ -148,11 +148,10 @@ def readDictionaryFromFile(dictFilePath):
 # out: features = dictionary where features[token] = True if token appears in tweet
 def extractFeaturesFromTweet(dictionary, tweet, category):
     tokens = tokenizeTweet(tweet)
-    features = {}
+    features = []
     for eachToken in tokens:
         if eachToken in dictionary:
-            features[eachToken] = True
-    features['classificationLabel'] = category
+            features.append(eachToken)
     return features
 
 def extractFeaturesFromAllTweets(dictionary, categoryList):
@@ -163,19 +162,21 @@ def extractFeaturesFromAllTweets(dictionary, categoryList):
         for tweet in tweetList:
             tmpList.append(extractFeaturesFromTweet(dictionary,tweet,category))
         classFeatures.append((tmpList,category))
-
     
-    # for (featuresDict, category) in classFeatures:
-    #     with open(category+'_features.txt','w') as f:
-    #         f.write(str(len(featuresDict.keys)))
-            
-    #   salvar em um arquivo com o nome 'category'_features.txt
-    #   salvar o numero de tweets len.(featuresList) como cabecalho
+    for (tweetFeaturesList, category) in classFeatures:
+        with open(category+'_features.txt','w') as f:
+            f.write(str(len(tweetFeaturesList)) + "\n")
+            for tweetFeatures in tweetFeaturesList:
+                for feature in tweetFeatures:
+                    f.write(feature+" ")
+                f.write("\n")
     
 if __name__ == '__main__':
-   #dictionary = updateCategoryDictionary('sports',1000)
+   dictionary = updateCategoryDictionary('sports',5000)
+   extractFeaturesFromAllTweets(dictionary,['sports'])
    #dictionary = updateCategoryDictionary('tech',1000)
-   dictionary = buildWholeDictionary(categoryList,1000)
+   #dictionary = buildWholeDictionary(categoryList,1000)
    #dictionary = buildWholeDictionary(categoryList,100)
    #print dictionary
-
+   #dictionary = readDictionaryFromFile("sports_dictionary.txt")
+   
