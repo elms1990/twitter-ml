@@ -116,11 +116,11 @@ def updateCategoryDictionary(category,nWords=None):
     return tmpDict
 
 def buildWholeDictionary(categoryList,nWords=None):
-    dictList= []
+    dictList= FreqDist()
     for category in categoryList:
-        tmpDict = buildCategoryDictionary(category,nWords)
-        #tmpDict = readDictionaryFromFile(category+categoryDictFilePath)
-        dictList.append(tmpDict.items())
+        tmpDict = updateCategoryDictionary(category,nWords)
+        dictList.update(tmpDict)
+    saveDictionaryToFile(dictList,'whole'+categoryDictFilePath)
     return dictList
 
 # saveDictionaryToFile() saves a dictionary into a file, one token in each line
@@ -152,7 +152,7 @@ def extractFeaturesFromTweet(dictionary, tweet, category):
     for eachToken in tokens:
         if eachToken in dictionary:
             features[eachToken] = True
-    features['class'] = category
+    features['classificationLabel'] = category
     return features
 
 def extractFeaturesFromAllTweets(dictionary, categoryList):
@@ -165,14 +165,17 @@ def extractFeaturesFromAllTweets(dictionary, categoryList):
         classFeatures.append((tmpList,category))
 
     
-    #for (featuresList, category) in classFeatures:
+    # for (featuresDict, category) in classFeatures:
+    #     with open(category+'_features.txt','w') as f:
+    #         f.write(str(len(featuresDict.keys)))
+            
     #   salvar em um arquivo com o nome 'category'_features.txt
     #   salvar o numero de tweets len.(featuresList) como cabecalho
     
 if __name__ == '__main__':
-   dictionary = updateCategoryDictionary('sports',1000)
-   dictionary = updateCategoryDictionary('tech',1000)
-   # dictionary = buildWholeDictionary(objCategory,restCategory,100)
+   #dictionary = updateCategoryDictionary('sports',1000)
+   #dictionary = updateCategoryDictionary('tech',1000)
+   dictionary = buildWholeDictionary(categoryList,1000)
    #dictionary = buildWholeDictionary(categoryList,100)
    #print dictionary
 
