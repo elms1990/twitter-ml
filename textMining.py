@@ -171,7 +171,7 @@ def extractFeaturesFromAllTweets(dictionary, categoryList):
                 f.write("\n")
     
 if __name__ == '__main__':
-   dictionary = updateCategoryDictionary('sports',5000)
+   dictionary = updateCategoryDictionary('sports',10)
    extractFeaturesFromAllTweets(dictionary,['sports'])
    #dictionary = updateCategoryDictionary('tech',1000)
    #dictionary = buildWholeDictionary(categoryList,1000)
