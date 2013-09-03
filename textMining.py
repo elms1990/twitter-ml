@@ -20,8 +20,6 @@ categoryDictFilePath = "_dictionary.txt"
 # stemming them as possible. Discard @users and urls but saves #hashtags
 # in: tweet = str
 # out: list[str]
-
-
 def tokenizeTweet(tweet):
     allWords = [word.lower() for word in word_tokenize(tweet)]
 
@@ -87,6 +85,7 @@ def buildCategoryDictionary(category,nWords=None):
         tmpDict = freq
     saveDictionaryToFile(tmpDict,category+categoryDictFilePath)
     return tmpDict
+
 
 def updateCategoryDictionary(category,nWords=None):
     tweetList = twitter_test.get_new_tweets(classn=category)
