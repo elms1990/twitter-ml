@@ -175,11 +175,12 @@ def extractFeaturesFromAllTweets(dictionary, categoryList):
                 f.write("\n")
     
 if __name__ == '__main__':
-   #dictionary = updateCategoryDictionary('sports',5000)
-   #extractFeaturesFromAllTweets(dictionary,['sports'])
+
+   dictionary = updateCategoryDictionary('sports',10)
+   extractFeaturesFromAllTweets(dictionary,['sports'])
    #dictionary = updateCategoryDictionary('tech',1000)
-   dictionary = buildWholeDictionary(categoryList,2500)
-   extractFeaturesFromAllTweets(dictionary,categoryList)
-   #dictionary = buildWholeDictionary(categoryList,100)
+   # dictionary = buildWholeDictionary(categoryList,2500)
+   # extractFeaturesFromAllTweets(dictionary,categoryList)
+   # #dictionary = buildWholeDictionary(categoryList,100)
    #print dictionary
    #dictionary = readDictionaryFromFile("sports_dictionary.txt")
