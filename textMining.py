@@ -1,20 +1,28 @@
-""" Script de text mining """
+############################# textMining.py ################################
+""" 
+Script responsible for all the functions related to text mining:
+Splitting a tweet into tokens, creating and updating the dictionaries and
+extracting the features of a tweet given a dictionary
+"""
+#############################################################################
+
+#### Defines and imports ######
 import twitter_test
 from nltk.tokenize import word_tokenize, sent_tokenize
 from nltk.corpus import stopwords
 from nltk.probability import FreqDist
 from nltk.stem.snowball import EnglishStemmer
-import string
+from string import punctuation
 
 categoryList = ['sports','tech']
 ourStopWords = [
     "'s", "n't", "''", "...", "``", "gt", "lt", "quot", "amp", "oelig", "scaron", "tilde", "ensp", "emsp",
     "zwnj", "zwj", "lrm", "rlm", "ndash", "mdash", "ldquo", "rdquo", "lsquo", "rsquo", "sbquo", "bdquo", "lsaquo", "rsaquo","--"]
-ourStopWords+= stopwords.words('english') + list(string.punctuation)
+ourStopWords+= stopwords.words('english') + list(punctuation)
 ourStopWords = set(ourStopWords)
-#ListaTweet = ["It was a great game yesterday! Kobe Bryant was a beast!!!","Kobe Bryant was awesome in yesterday's game! GO LAKERS", "Go Lakers, go lakers!"]
 
 categoryDictFilePath = "_dictionary.txt"
+#############################################################################
 
 # tokenizeTweet(tweet) receives a string representing the tweet and parses it into tokens
 # stemming them as possible. Discard @users and urls but saves #hashtags
@@ -176,11 +184,12 @@ def extractFeaturesFromAllTweets(dictionary, categoryList):
     
 if __name__ == '__main__':
 
-   dictionary = updateCategoryDictionary('sports',1000)
+   #dictionary = updateCategoryDictionary('sports',1000)
    #extractFeaturesFromAllTweets(dictionary,['sports'])
-   dictionary = updateCategoryDictionary('tech',1000)
+   #dictionary = updateCategoryDictionary('tech',1000)
    # dictionary = buildWholeDictionary(categoryList,2500)
    # extractFeaturesFromAllTweets(dictionary,categoryList)
    # #dictionary = buildWholeDictionary(categoryList,100)
    #print dictionary
    #dictionary = readDictionaryFromFile("sports_dictionary.txt")
+   pass
