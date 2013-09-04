@@ -112,7 +112,8 @@ def updateCategoryDictionary(category):
 def buildWholeDictionary(categoryList, nWords):
     dictList = []
     for category in categoryList:
-        tmpDict = updateCategoryDictionary(category)
+        #tmpDict = updateCategoryDictionary(category)
+        tmpDict = buildCategoryDictionary(category)
         dictList.append(tmpDict)
     wholeDictionary = selectNWordsFromDict(dictList, nWords)
     saveDictionaryToFile(wholeDictionary, 'whole' + categoryDictFilePath)
@@ -215,7 +216,7 @@ def extractFeaturesFromAllTweets(dictionary, categoryList, trainPercentage = 0.0
                     f.write("\n")
             with open(category + '_TEST_features.txt', 'w') as f:
                 f.write(str(nTest) + "\n")
-                for i in range(nTrain):
+                for i in range(nTest):
                     for feature in tweetFeaturesList[i+nTrain]:
                         f.write(feature + " ")
                     f.write("\n")
@@ -226,7 +227,7 @@ if __name__ == '__main__':
     # extractFeaturesFromAllTweets(dictionary,['sports'])
     # dictionary = buildWholeDictionary(categoryList,2500)
     dictionary = buildWholeDictionary(categoryList, 1000)
-    extractFeaturesFromAllTweets(dictionary,categoryList)
+    extractFeaturesFromAllTweets(dictionary,categoryList,0.9)
     # print dictionary
     #dictionary = readDictionaryFromFile("sports_dictionary.txt")
     pass
