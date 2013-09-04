@@ -23,7 +23,7 @@ ourStopWords = [
 ourStopWords += stopwords.words('english') + list(punctuation)
 ourStopWords = set(ourStopWords)
 
-categoryDictFilePath = "_dictionary.txt"
+categoryDictFilePath = "_dictionary.dat"
 freqPercentage = 0.9
 nonFreqPercentage = 0.1
 #
@@ -170,14 +170,23 @@ def readDictionaryFromFile(dictFilePath):
 # extractFeaturesFromTweet() extracts the features of a given tweet using the dictionary
 # in: dictionary = FreqDist/list(str), tweet = str, category = str
 # out: features = list(str) with the tokens that appear in tweet
+# out2: features = list(0,1) where 1 if the i-th token of the dictionary appeared in tweet. 0 otherwise
 
 
 def extractFeaturesFromTweet(dictionary, tweet, category):
     tokens = tokenizeTweet(tweet)
     features = []
-    for eachToken in tokens:
-        if eachToken in dictionary:
-            features.append(eachToken)
+    # First way of doing it
+    # for eachToken in tokens:
+    #     if eachToken in dictionary:
+    #         features.append(eachToken)
+
+    # Another way. CAREFULL probably too big!!!
+    for eachToken in dictionary:
+        if eachToken in tokens:
+            features.append('1')
+        else:
+            features.append('0')
     return features
 
 # extractFeaturesFromAllTweets() extracts the features from all the tweets of categoryList
@@ -197,7 +206,7 @@ def extractFeaturesFromAllTweets(dictionary, categoryList, trainPercentage = 0.0
 
     if trainPercentage == 0.0:
         for (tweetFeaturesList, category) in classFeatures:
-            with open(category + '_features.txt', 'w') as f:
+            with open(category + '_features.dat', 'w') as f:
                 f.write(str(len(tweetFeaturesList)) + "\n")
                 for tweetFeatures in tweetFeaturesList:
                     for feature in tweetFeatures:
@@ -208,13 +217,13 @@ def extractFeaturesFromAllTweets(dictionary, categoryList, trainPercentage = 0.0
             nTrain = int(ceil(trainPercentage*len(tweetFeaturesList)))
             nTest = len(tweetFeaturesList) - nTrain
 
-            with open(category + '_TRAIN_features.txt', 'w') as f:
+            with open(category + '_TRAIN_features.dat', 'w') as f:
                 f.write(str(nTrain) + "\n")
                 for i in range(nTrain):
                     for feature in tweetFeaturesList[i]:
                         f.write(feature + " ")
                     f.write("\n")
-            with open(category + '_TEST_features.txt', 'w') as f:
+            with open(category + '_TEST_features.dat', 'w') as f:
                 f.write(str(nTest) + "\n")
                 for i in range(nTest):
                     for feature in tweetFeaturesList[i+nTrain]:
@@ -226,8 +235,8 @@ if __name__ == '__main__':
     # dictionary = updateCategoryDictionary('tech')
     # extractFeaturesFromAllTweets(dictionary,['sports'])
     # dictionary = buildWholeDictionary(categoryList,2500)
-    dictionary = buildWholeDictionary(categoryList, 1000)
+    dictionary = buildWholeDictionary(categoryList, 5000)
     extractFeaturesFromAllTweets(dictionary,categoryList,0.9)
     # print dictionary
-    #dictionary = readDictionaryFromFile("sports_dictionary.txt")
+    #dictionary = readDictionaryFromFile("sports_dictionary.dat")
     pass
