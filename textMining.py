@@ -1,28 +1,32 @@
-############################# textMining.py ################################
-""" 
+# textMining.py ################################
+"""
 Script responsible for all the functions related to text mining:
 Splitting a tweet into tokens, creating and updating the dictionaries and
 extracting the features of a tweet given a dictionary
 """
-#############################################################################
+#
 
-#### Defines and imports ######
+# Defines and imports ######
 import twitter_test
 from nltk.tokenize import word_tokenize, sent_tokenize
 from nltk.corpus import stopwords
 from nltk.probability import FreqDist
 from nltk.stem.snowball import EnglishStemmer
 from string import punctuation
+from math import ceil
+from random import sample
 
-categoryList = ['sports','tech']
+categoryList = ['sports', 'tech']
 ourStopWords = [
     "'s", "n't", "''", "...", "``", "gt", "lt", "quot", "amp", "oelig", "scaron", "tilde", "ensp", "emsp",
-    "zwnj", "zwj", "lrm", "rlm", "ndash", "mdash", "ldquo", "rdquo", "lsquo", "rsquo", "sbquo", "bdquo", "lsaquo", "rsaquo","--"]
-ourStopWords+= stopwords.words('english') + list(punctuation)
+    "zwnj", "zwj", "lrm", "rlm", "ndash", "mdash", "ldquo", "rdquo", "lsquo", "rsquo", "sbquo", "bdquo", "lsaquo", "rsaquo", "--"]
+ourStopWords += stopwords.words('english') + list(punctuation)
 ourStopWords = set(ourStopWords)
 
 categoryDictFilePath = "_dictionary.txt"
-#############################################################################
+freqPercentage = 0.9
+nonFreqPercentage = 0.1
+#
 
 # tokenizeTweet(tweet) receives a string representing the tweet and parses it into tokens
 # stemming them as possible. Discard @users and urls but saves #hashtags
@@ -58,7 +62,8 @@ def tokenizeTweet(tweet):
         else:
             i += 1
 
-    possibleWords = filter(lambda x: x not in ourStopWords and x.isdigit() == False, allWords)
+    possibleWords = filter(
+        lambda x: x not in ourStopWords and x.isdigit() == False, allWords)
 
     stemmer = EnglishStemmer()
     tokens = []
@@ -68,33 +73,22 @@ def tokenizeTweet(tweet):
         tokens.append('#' + tag)
     return tokens
 
-# buildDictionary() creates the dictionary from the <nWords> most frequent tokens of the tweets from a given <category>
+# buildDictionary() creates the dictionary from the tokens of the tweets from a given <category>
 # Also saves the dictionary to a file
-# if <nWords> is empty, nWords = None => gets all tokens
-# in: nWords = int, category = str
+# in: category = str
 # out: FreqDist()
-def buildCategoryDictionary(category,nWords=None):
+def buildCategoryDictionary(category):
     tweetList = twitter_test.get_tweets_text(classn=category)
     freq = FreqDist()
-    tmpDict = FreqDist()
     for tweet in tweetList:
         freq.update(word for word in tokenizeTweet(tweet))
-    if nWords != None:
-        i = 0
-        for (token,frequency) in freq.iteritems():
-            tmpDict[token] = frequency
-            i+=1
-            if i == nWords:
-                break
-    else:
-        tmpDict = freq
-    saveDictionaryToFile(tmpDict,category+categoryDictFilePath)
-    return tmpDict
+    saveDictionaryToFile(freq, category + categoryDictFilePath)
+    return freq
 
 # updateCategoryDictionary() download new tweets from the server and update the dictionary saved earlier
 # if there isn't a dictionary file, the function creates the dictionary
 # parameters and the return value is the same of buildCategoryDictionary()
-def updateCategoryDictionary(category,nWords=None):
+def updateCategoryDictionary(category):
     tweetList = twitter_test.get_new_tweets(classn=category)
     freq = FreqDist()
     tmpDict = FreqDist()
@@ -103,38 +97,56 @@ def updateCategoryDictionary(category,nWords=None):
         freq.update(word for word in tokenizeTweet(tweet))
 
     try:
-        oldDict = readDictionaryFromFile(category+categoryDictFilePath)
+        oldDict = readDictionaryFromFile(category + categoryDictFilePath)
     except:
-        newDict = buildCategoryDictionary(category,nWords)
+        newDict = buildCategoryDictionary(category)
         return newDict
 
     oldDict.update(freq)
-    if nWords != None:
-        i = 0
-        for (token,frequency) in oldDict.iteritems():
-            tmpDict[token] = frequency
-            i+=1
-            if i == nWords:
-                break
-    else:
-        tmpDict = oldDict
-    saveDictionaryToFile(tmpDict,category+categoryDictFilePath)
-    return tmpDict
+    saveDictionaryToFile(oldDict, category + categoryDictFilePath)
+    return oldDict
 
 # buildWholeDictionary() combines the dictionaries of every category in categoryList
 # in: categoryList = list(str), nWords = int
-# out: FreqDist
-def buildWholeDictionary(categoryList,nWords=None):
-    dictList= FreqDist()
+# out: [str] = list of the tokens from the dictionary
+def buildWholeDictionary(categoryList, nWords):
+    dictList = []
     for category in categoryList:
-        tmpDict = updateCategoryDictionary(category,nWords)
-        dictList.update(tmpDict)
-    saveDictionaryToFile(dictList,'whole'+categoryDictFilePath)
-    return dictList
+        tmpDict = updateCategoryDictionary(category)
+        dictList.append(tmpDict)
+    wholeDictionary = selectNWordsFromDict(dictList, nWords)
+    saveDictionaryToFile(wholeDictionary, 'whole' + categoryDictFilePath)
+    return wholeDictionary.keys()
+
+# selectNWordsFromDict() receives the FreqDists of each category and samples nWords from it
+# The size of the resultant dictionary is smaller than nWords
+# in: dictList = [FreqDist,...], nWords = int
+# out: FreqDist()
+def selectNWordsFromDict(dictList, nWords):
+    wordPerCategory = nWords / len(dictList)
+    freqWords = int(ceil(wordPerCategory * freqPercentage))
+    nonFreqWords = int(ceil(wordPerCategory * nonFreqPercentage))
+
+    wholeDictionary = []
+
+    print "Selecting ", nWords, " words for the big dictionary"
+    print wordPerCategory, " words per category"
+    print freqWords, " frequent words"
+    print nonFreqWords, " non frequent words"
+
+    for catDict in dictList:
+        keys = catDict.keys()
+        print keys[:freqWords]
+        wholeDictionary += keys[:freqWords]
+        wholeDictionary += sample(keys[freqWords:], nonFreqWords)
+
+    return FreqDist(wholeDictionary)  #returns a FreqDist just because it is easier to save it to a file
 
 # saveDictionaryToFile() saves a dictionary into a file, one token in each line
 # in: dictionary = FreqDist, dictFilePath = str
 # out: None
+
+
 def saveDictionaryToFile(dictionary, dictFilePath):
     with open(dictFilePath, "w") as f:
         for token in dictionary:
@@ -143,6 +155,8 @@ def saveDictionaryToFile(dictionary, dictFilePath):
 # readDictionaryFromFile() reads the <dictFilePath> file and saves the tokens into a set
 # in: dictFilePath = srt
 # out: dictionary = FreqDist
+
+
 def readDictionaryFromFile(dictFilePath):
     dictionary = FreqDist()
     with open(dictFilePath, "r") as f:
@@ -153,8 +167,10 @@ def readDictionaryFromFile(dictFilePath):
     return dictionary
 
 # extractFeaturesFromTweet() extracts the features of a given tweet using the dictionary
-# in: dictionary = FreqDist, tweet = str, category = str
+# in: dictionary = FreqDist/list(str), tweet = str, category = str
 # out: features = list(str) with the tokens that appear in tweet
+
+
 def extractFeaturesFromTweet(dictionary, tweet, category):
     tokens = tokenizeTweet(tweet)
     features = []
@@ -164,32 +180,35 @@ def extractFeaturesFromTweet(dictionary, tweet, category):
     return features
 
 # extractFeaturesFromAllTweets() extracts the features from all the tweets of categoryList
-# saving them to a file, where each line represents the tokens/features activated of a example
+# saving them to a file, where each line represents the tokens/features
+# activated of a example
+
+
 def extractFeaturesFromAllTweets(dictionary, categoryList):
     classFeatures = []
     for category in categoryList:
         tmpList = []
         tweetList = twitter_test.get_tweets_text(classn=category)
         for tweet in tweetList:
-            tmpList.append(extractFeaturesFromTweet(dictionary,tweet,category))
-        classFeatures.append((tmpList,category))
-    
+            tmpList.append(
+                extractFeaturesFromTweet(dictionary, tweet, category))
+        classFeatures.append((tmpList, category))
+
     for (tweetFeaturesList, category) in classFeatures:
-        with open(category+'_features.txt','w') as f:
+        with open(category + '_features.txt', 'w') as f:
             f.write(str(len(tweetFeaturesList)) + "\n")
             for tweetFeatures in tweetFeaturesList:
                 for feature in tweetFeatures:
-                    f.write(feature+" ")
+                    f.write(feature + " ")
                 f.write("\n")
-    
-if __name__ == '__main__':
 
-   #dictionary = updateCategoryDictionary('sports',1000)
-   #extractFeaturesFromAllTweets(dictionary,['sports'])
-   #dictionary = updateCategoryDictionary('tech',1000)
-   # dictionary = buildWholeDictionary(categoryList,2500)
-   # extractFeaturesFromAllTweets(dictionary,categoryList)
-   # #dictionary = buildWholeDictionary(categoryList,100)
-   #print dictionary
-   #dictionary = readDictionaryFromFile("sports_dictionary.txt")
-   pass
+if __name__ == '__main__':
+    # dictionary = updateCategoryDictionary('sports')
+    # dictionary = updateCategoryDictionary('tech')
+    # extractFeaturesFromAllTweets(dictionary,['sports'])
+    # dictionary = buildWholeDictionary(categoryList,2500)
+    dictionary = buildWholeDictionary(categoryList, 1000)
+    extractFeaturesFromAllTweets(dictionary,categoryList)
+    # print dictionary
+    #dictionary = readDictionaryFromFile("sports_dictionary.txt")
+    pass
