@@ -182,9 +182,9 @@ def extractFeaturesFromTweet(dictionary, tweet, category):
 # extractFeaturesFromAllTweets() extracts the features from all the tweets of categoryList
 # saving them to a file, where each line represents the tokens/features
 # activated of a example
+# trainPercentage represents the % of training examples, if > 0.0 separates into train and test group
 
-
-def extractFeaturesFromAllTweets(dictionary, categoryList):
+def extractFeaturesFromAllTweets(dictionary, categoryList, trainPercentage = 0.0):
     classFeatures = []
     for category in categoryList:
         tmpList = []
@@ -194,13 +194,31 @@ def extractFeaturesFromAllTweets(dictionary, categoryList):
                 extractFeaturesFromTweet(dictionary, tweet, category))
         classFeatures.append((tmpList, category))
 
-    for (tweetFeaturesList, category) in classFeatures:
-        with open(category + '_features.txt', 'w') as f:
-            f.write(str(len(tweetFeaturesList)) + "\n")
-            for tweetFeatures in tweetFeaturesList:
-                for feature in tweetFeatures:
-                    f.write(feature + " ")
-                f.write("\n")
+    if trainPercentage == 0.0:
+        for (tweetFeaturesList, category) in classFeatures:
+            with open(category + '_features.txt', 'w') as f:
+                f.write(str(len(tweetFeaturesList)) + "\n")
+                for tweetFeatures in tweetFeaturesList:
+                    for feature in tweetFeatures:
+                        f.write(feature + " ")
+                    f.write("\n")
+    else:
+        for (tweetFeaturesList, category) in classFeatures:
+            nTrain = int(ceil(trainPercentage*len(tweetFeaturesList)))
+            nTest = len(tweetFeaturesList) - nTrain
+
+            with open(category + '_TRAIN_features.txt', 'w') as f:
+                f.write(str(nTrain) + "\n")
+                for i in range(nTrain):
+                    for feature in tweetFeaturesList[i]:
+                        f.write(feature + " ")
+                    f.write("\n")
+            with open(category + '_TEST_features.txt', 'w') as f:
+                f.write(str(nTest) + "\n")
+                for i in range(nTrain):
+                    for feature in tweetFeaturesList[i+nTrain]:
+                        f.write(feature + " ")
+                    f.write("\n")
 
 if __name__ == '__main__':
     # dictionary = updateCategoryDictionary('sports')
