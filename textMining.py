@@ -7,7 +7,7 @@ extracting the features of a tweet given a dictionary
 #
 
 # Defines and imports ######
-import twitter_test
+import twitter_fetch
 from nltk.tokenize import word_tokenize, sent_tokenize
 from nltk.corpus import stopwords
 from nltk.probability import FreqDist
@@ -78,7 +78,7 @@ def tokenizeTweet(tweet):
 # in: category = str
 # out: FreqDist()
 def buildCategoryDictionary(category):
-    tweetList = twitter_test.get_tweets_text(classn=category)
+    tweetList = twitter_fetch.get_tweets_text(classn=category)
     freq = FreqDist()
     for tweet in tweetList:
         freq.update(word for word in tokenizeTweet(tweet))
@@ -89,7 +89,7 @@ def buildCategoryDictionary(category):
 # if there isn't a dictionary file, the function creates the dictionary
 # parameters and the return value is the same of buildCategoryDictionary()
 def updateCategoryDictionary(category):
-    tweetList = twitter_test.get_new_tweets(classn=category)
+    tweetList = twitter_fetch.get_new_tweets(classn=category)
     freq = FreqDist()
     tmpDict = FreqDist()
 
@@ -198,7 +198,7 @@ def extractFeaturesFromAllTweets(dictionary, categoryList, trainPercentage = 0.0
     classFeatures = []
     for category in categoryList:
         tmpList = []
-        tweetList = twitter_test.get_tweets_text(classn=category)
+        tweetList = twitter_fetch.get_tweets_text(classn=category)
         for tweet in tweetList:
             tmpList.append(
                 extractFeaturesFromTweet(dictionary, tweet, category))
