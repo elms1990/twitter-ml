@@ -1,5 +1,6 @@
 from twython import Twython
 from pymongo import Connection
+import sys
 
 db = Connection(
     'mongodb://test:test@paulo.mongohq.com:10063/TweetCat').TweetCat
@@ -67,11 +68,38 @@ def download_tweets():
         print 'saved all tweets from: %s' % acc['user']
     print "NEW:", count_new_tweets(), "TOTAL:", db.tweets.count()
 
+def get_args(argv, opt):
+    i = 0
 
+    for arg in argv:
+        if arg == opt:
+            return i
+        i += 1
+    return -1
 
 if __name__ == '__main__':
+    if len(sys.argv) == 1:
+        print 'USAGE: twitter_test [opt]\n\n\
+       COMMANDS:\n\
+       -add ACCOUNT CATEGORY: Adds a new account to the category.\n\
+       -update: Updates all registered categories.'
+        quit()
 
+    index = get_args(sys.argv, '-add')
+    if index != -1:
+        acc = sys.argv[index + 1]
+        cat = sys.argv[index + 2]
+
+        db.accounts.save({'user': acc, 'cat': cat})
+
+        print 'Account ' +  acc + ' successfully added to category ' + cat
+
+
+    index = get_args(sys.argv, '-update')
+    if index != -1:
+        download_tweets()
+    
     # para adicionar novas contas rodar: db.accounts.save({'user':NOMEDACONTA,
     # 'cat':NOMEDACATEGORIA})
-    download_tweets()
+    #download_tweets()
     # 25801
