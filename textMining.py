@@ -112,8 +112,8 @@ def updateCategoryDictionary(category):
 def buildWholeDictionary(categoryList, nWords):
     dictList = []
     for category in categoryList:
-        #tmpDict = updateCategoryDictionary(category)
-        tmpDict = buildCategoryDictionary(category)
+        tmpDict = updateCategoryDictionary(category)
+        #tmpDict = buildCategoryDictionary(category)
         dictList.append(tmpDict)
     wholeDictionary = selectNWordsFromDict(dictList, nWords)
     saveDictionaryToFile(wholeDictionary, 'whole' + categoryDictFilePath)
@@ -231,12 +231,7 @@ def extractFeaturesFromAllTweets(dictionary, categoryList, trainPercentage = 0.0
                     f.write("\n")
 
 if __name__ == '__main__':
-    # dictionary = updateCategoryDictionary('sports')
-    # dictionary = updateCategoryDictionary('tech')
-    # extractFeaturesFromAllTweets(dictionary,['sports'])
-    # dictionary = buildWholeDictionary(categoryList,2500)
-    dictionary = buildWholeDictionary(categoryList, 4000)
-    #extractFeaturesFromAllTweets(dictionary,categoryList,0.9)
-    # print dictionary
-    #dictionary = readDictionaryFromFile("sports_dictionary.dat")
-    pass
+    #dictionary = buildWholeDictionary(categoryList, 1000)
+    dictionary = readDictionaryFromFile("whole_dictionary.dat")
+    extractFeaturesFromAllTweets(dictionary,categoryList,0.5)
+    
