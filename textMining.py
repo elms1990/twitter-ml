@@ -7,7 +7,7 @@ extracting the features of a tweet given a dictionary
 #
 
 # Defines and imports ######
-#import twitter_fetch
+import twitter_fetch
 from nltk.tokenize import word_tokenize, sent_tokenize
 from nltk.corpus import stopwords
 from nltk.probability import FreqDist
@@ -235,8 +235,8 @@ if __name__ == '__main__':
     # dictionary = updateCategoryDictionary('tech')
     # extractFeaturesFromAllTweets(dictionary,['sports'])
     # dictionary = buildWholeDictionary(categoryList,2500)
-    dictionary = buildWholeDictionary(categoryList, 5000)
-    extractFeaturesFromAllTweets(dictionary,categoryList,0.9)
+    dictionary = buildWholeDictionary(categoryList, 4000)
+    #extractFeaturesFromAllTweets(dictionary,categoryList,0.9)
     # print dictionary
     #dictionary = readDictionaryFromFile("sports_dictionary.dat")
     pass
