@@ -7,7 +7,7 @@ extracting the features of a tweet given a dictionary
 #
 
 # Defines and imports ######
-import twitter_fetch
+#import twitter_fetch
 from nltk.tokenize import word_tokenize, sent_tokenize
 from nltk.corpus import stopwords
 from nltk.probability import FreqDist
