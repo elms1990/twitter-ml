@@ -16,7 +16,7 @@ from string import punctuation
 from math import ceil
 from random import sample
 
-categoryList = ['sports', 'tech']
+categoryList = ['sports', 'tech','religion']
 ourStopWords = [
     "'s", "n't", "''", "...", "``", "gt", "lt", "quot", "amp", "oelig", "scaron", "tilde", "ensp", "emsp",
     "zwnj", "zwj", "lrm", "rlm", "ndash", "mdash", "ldquo", "rdquo", "lsquo", "rsquo", "sbquo", "bdquo", "lsaquo", "rsaquo", "--"]
@@ -112,8 +112,8 @@ def updateCategoryDictionary(category):
 def buildWholeDictionary(categoryList, nWords):
     dictList = []
     for category in categoryList:
-        tmpDict = updateCategoryDictionary(category)
-        #tmpDict = buildCategoryDictionary(category)
+        #tmpDict = updateCategoryDictionary(category)
+        tmpDict = buildCategoryDictionary(category)
         dictList.append(tmpDict)
     wholeDictionary = selectNWordsFromDict(dictList, nWords)
     saveDictionaryToFile(wholeDictionary, 'whole' + categoryDictFilePath)
@@ -137,7 +137,7 @@ def selectNWordsFromDict(dictList, nWords):
 
     for catDict in dictList:
         keys = catDict.keys()
-        print keys[:freqWords]
+        #print keys[:freqWords]
         wholeDictionary += keys[:freqWords]
         wholeDictionary += sample(keys[freqWords:], nonFreqWords)
 
@@ -217,6 +217,10 @@ def extractFeaturesFromAllTweets(dictionary, categoryList, trainPercentage = 0.0
             nTrain = int(ceil(trainPercentage*len(tweetFeaturesList)))
             nTest = len(tweetFeaturesList) - nTrain
 
+	    print "# tweets "+category+": "
+	    print nTrain," TRAIN"
+	    print nTest, " TEST"
+
             with open(category + '_TRAIN_features.dat', 'w') as f:
                 f.write(str(nTrain) + "\n")
                 for i in range(nTrain):
@@ -231,14 +235,6 @@ def extractFeaturesFromAllTweets(dictionary, categoryList, trainPercentage = 0.0
                     f.write("\n")
 
 if __name__ == '__main__':
-    # dictionary = updateCategoryDictionary('sports')
-    # dictionary = updateCategoryDictionary('tech')
-    # extractFeaturesFromAllTweets(dictionary,['sports'])
-    # dictionary = buildWholeDictionary(categoryList,2500)
-    print "HEY"
-    dictionary = buildWholeDictionary(categoryList, 1000)
-    print "HEY"
+    dictionary = buildWholeDictionary(categoryList, 2500)
     extractFeaturesFromAllTweets(dictionary,categoryList,0.8)
-    # print dictionary
-    #dictionary = readDictionaryFromFile("sports_dictionary.dat")
     pass
