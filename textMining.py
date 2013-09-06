@@ -231,7 +231,14 @@ def extractFeaturesFromAllTweets(dictionary, categoryList, trainPercentage = 0.0
                     f.write("\n")
 
 if __name__ == '__main__':
-    #dictionary = buildWholeDictionary(categoryList, 1000)
-    dictionary = readDictionaryFromFile("whole_dictionary.dat")
+    # dictionary = updateCategoryDictionary('sports')
+    # dictionary = updateCategoryDictionary('tech')
+    # extractFeaturesFromAllTweets(dictionary,['sports'])
+    # dictionary = buildWholeDictionary(categoryList,2500)
+    print "HEY"
+    dictionary = buildWholeDictionary(categoryList, 1000)
+    print "HEY"
     extractFeaturesFromAllTweets(dictionary,categoryList,0.5)
-    
+    # print dictionary
+    #dictionary = readDictionaryFromFile("sports_dictionary.dat")
+    pass
