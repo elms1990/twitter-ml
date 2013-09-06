@@ -238,7 +238,7 @@ if __name__ == '__main__':
     print "HEY"
     dictionary = buildWholeDictionary(categoryList, 1000)
     print "HEY"
-    extractFeaturesFromAllTweets(dictionary,categoryList,0.5)
+    extractFeaturesFromAllTweets(dictionary,categoryList,0.8)
     # print dictionary
     #dictionary = readDictionaryFromFile("sports_dictionary.dat")
     pass
