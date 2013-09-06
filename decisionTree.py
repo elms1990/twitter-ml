@@ -68,8 +68,8 @@ def analyseClassification(resultLabels, targetLabels):
 
 if __name__ == '__main__':
 	#dictionary = textMining.readDictionaryFromFile("whole"+dictFilePath)
-	k = formatExamples(categoryList,5000,"TRAIN")
-	j = formatExamples(categoryList,200,"TEST")
+	k = formatExamples(categoryList,22260,"TRAIN")
+	j = formatExamples(categoryList,5564,"TEST")
 	clf = tree.DecisionTreeClassifier()
 	clf = clf.fit(k[0],k[1])
 	result = clf.predict(j[0])
