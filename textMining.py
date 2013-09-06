@@ -112,8 +112,8 @@ def updateCategoryDictionary(category):
 def buildWholeDictionary(categoryList, nWords):
     dictList = []
     for category in categoryList:
-        #tmpDict = updateCategoryDictionary(category)
-        tmpDict = buildCategoryDictionary(category)
+        tmpDict = updateCategoryDictionary(category)
+        #tmpDict = buildCategoryDictionary(category)
         dictList.append(tmpDict)
     wholeDictionary = selectNWordsFromDict(dictList, nWords)
     saveDictionaryToFile(wholeDictionary, 'whole' + categoryDictFilePath)
