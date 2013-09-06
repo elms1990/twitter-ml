@@ -235,8 +235,10 @@ if __name__ == '__main__':
     # dictionary = updateCategoryDictionary('tech')
     # extractFeaturesFromAllTweets(dictionary,['sports'])
     # dictionary = buildWholeDictionary(categoryList,2500)
-    dictionary = buildWholeDictionary(categoryList, 4000)
-    #extractFeaturesFromAllTweets(dictionary,categoryList,0.9)
+    print "HEY"
+    dictionary = buildWholeDictionary(categoryList, 1000)
+    print "HEY"
+    extractFeaturesFromAllTweets(dictionary,categoryList,0.5)
     # print dictionary
     #dictionary = readDictionaryFromFile("sports_dictionary.dat")
     pass

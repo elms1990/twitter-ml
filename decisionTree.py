@@ -14,32 +14,64 @@ categoryList = ['sports','tech']
 #
 
 #flagTrainTest = TRAIN or TEST
-def formatExamples(categoryList,flagTrainTest='TRAIN'):
+def formatExamples(categoryList,nExamples,flagTrainTest):
 	inputFeaturesVectors = []
 	inputLabels = []
-	x = 1901
-	if flagTrainTest == "TEST":
-		x = 51
 
 	for i in range(len(categoryList)):
 		with open(categoryList[i]+"_"+flagTrainTest+FeaturesFilePath,'r') as f:
-			lines = f.readlines()[1:x]
+			lines = f.readlines()[1:nExamples+1]
 		for line in lines:
 			tmp = [int(value) for value in line.split()]
 			inputFeaturesVectors.append(tmp)
 			inputLabels.append(i)
 	return (inputFeaturesVectors,inputLabels)	
 
+def analyseClassification(resultLabels, targetLabels):
+    truePositive, trueNegative = 0.0, 0.0
+    falsePositive, falseNegative = 0.0, 0.0
+
+    for i in range(len(targetLabels)):
+        if targetLabels[i] == 1 and resultLabels[i] == 1:
+            truePositive += 1.0
+        elif targetLabels[i] == 1 and resultLabels[i] == 0:
+            falseNegative += 1.0
+        elif targetLabels[i] == 0 and resultLabels[i] == 1:
+            falsePositive += 1.0
+        elif targetLabels[i] == 0 and resultLabels[i] == 0:
+            trueNegative += 1.0
+
+    # proportion of correct predictions considering the positive and negative
+    # inputs#
+    accuracy = float((truePositive + trueNegative)/len(targetLabels)) * 100.0
+    # the proportion of the true positives, that is, the ability of the system
+    # on predicting the correct values#
+    sensitivity = float(truePositive / (truePositive + falseNegative)) * 100.0
+    # the ability of the system on predicting the correct values for the cases
+    # that are the opposite to the desired one
+    specificity = float(trueNegative / (trueNegative + falsePositive)) * 100.0
+    # a good evaluator for measure the responsiveness in a overall situation
+    # to the production of false positives and false negatives
+    efficiency = float((sensitivity + specificity) / 2)
+    # indicates the estimation of how good the system is when making a
+    # positive affirmation
+    ppv = float(truePositive / (truePositive + falsePositive)) * 100.0
+    # estimation of how good the system is when making a negative affirmation
+    npv = float(trueNegative / (trueNegative + falseNegative)) * 100.0
+
+    print "Accuracy: ", accuracy, "%"
+    print "Sensitivity: ", sensitivity, "%"
+    print "Specificity: ", specificity, "%"
+    print "Efficiency: ", efficiency, "%"
+    print "Positive Predict Value: ", ppv, "%"
+    print "Negative Predict Value: ", npv, "%"
+
 if __name__ == '__main__':
 	#dictionary = textMining.readDictionaryFromFile("whole"+dictFilePath)
-	k = formatExamples(categoryList,"TRAIN")
-	j = formatExamples(categoryList,"TEST")
+	k = formatExamples(categoryList,5000,"TRAIN")
+	j = formatExamples(categoryList,200,"TEST")
 	clf = tree.DecisionTreeClassifier()
 	clf = clf.fit(k[0],k[1])
 	result = clf.predict(j[0])
 
-	i = 0
-	for m in range(len(j[1])):
-		if j[1][m]==result[m]:
-			i+=1
-	print "Got ",str(i),"from ",str(len(j[1]))
+	analyseClassification(result,j[1])
