@@ -12,9 +12,9 @@ import textMining
 
 dictFilePath = "_dictionary.dat"
 FeaturesFilePath = "_features.dat"
-categoryList = ['sports','tech','religion']
+categoryList = ['tech','sports','religion']
 
-trainGroupSize = 10000
+trainGroupSize = 7500
 testGroupSize = 2500
 #
 
