@@ -235,6 +235,6 @@ def extractFeaturesFromAllTweets(dictionary, categoryList, trainPercentage = 0.0
                     f.write("\n")
 
 if __name__ == '__main__':
-    dictionary = buildWholeDictionary(categoryList, 2500)
+    dictionary = buildWholeDictionary(categoryList, 1000)
     extractFeaturesFromAllTweets(dictionary,categoryList,0.8)
     pass

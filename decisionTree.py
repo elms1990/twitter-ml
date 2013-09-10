@@ -12,26 +12,37 @@ import textMining
 
 dictFilePath = "_dictionary.dat"
 FeaturesFilePath = "_features.dat"
-categoryList = ['tech','sports','religion']
+categoryList = ['sports','tech','religion']
 
 trainGroupSize = 10000
 testGroupSize = 2500
-########
+#
 
 #flagTrainTest = TRAIN or TEST
-def formatExamples(categoryList,nExamples,flagTrainTest):
-	inputFeaturesVectors = []
-	inputLabels = []
 
-	for i in range(len(categoryList)):
-		with open(categoryList[i]+"_"+flagTrainTest+FeaturesFilePath,'r') as f:
-			#lines = f.readlines()[1:nExamples+1]
-			lines = sample(f.readlines()[1:],nExamples)
-		for line in lines:
-			tmp = [int(value) for value in line.split()]
-			inputFeaturesVectors.append(tmp)
-			inputLabels.append(i)
-	return (inputFeaturesVectors,inputLabels)	
+
+def formatExamples(categoryList, nExamples, flagTrainTest):
+    inputFeaturesVectors = []
+    inputLabels = []
+
+    for i in range(len(categoryList)):
+        with open(categoryList[i] + "_" + flagTrainTest + FeaturesFilePath, 'r') as f:
+            #lines = f.readlines()[1:nExamples+1]
+            lines = sample(f.readlines()[1:], nExamples)
+        for line in lines:
+            tmp = [int(value) for value in line.split()]
+            inputFeaturesVectors.append(tmp)
+            
+            #Multiclass classification
+            #inputLabels.append(i)
+
+            #OneVsAll
+            if i > 0:
+                inputLabels.append(0)
+            else:
+                inputLabels.append(1)
+    return (inputFeaturesVectors, inputLabels)
+
 
 def analyseClassification(resultLabels, targetLabels):
     truePositive, trueNegative = 0.0, 0.0
@@ -49,7 +60,7 @@ def analyseClassification(resultLabels, targetLabels):
 
     # proportion of correct predictions considering the positive and negative
     # inputs#
-    accuracy = float((truePositive + trueNegative)/len(targetLabels)) * 100.0
+    accuracy = float((truePositive + trueNegative) / len(targetLabels)) * 100.0
     # the proportion of the true positives, that is, the ability of the system
     # on predicting the correct values#
     sensitivity = float(truePositive / (truePositive + falseNegative)) * 100.0
@@ -73,12 +84,14 @@ def analyseClassification(resultLabels, targetLabels):
     print "Negative Predict Value: ", npv, "%"
 
 if __name__ == '__main__':
-	#dictionary = textMining.readDictionaryFromFile("whole"+dictFilePath)
-	k = formatExamples(categoryList,trainGroupSize,"TRAIN")
-	j = formatExamples(categoryList,testGroupSize,"TEST")
-
-	clf = tree.DecisionTreeClassifier()
-	clf = clf.fit(k[0],k[1])
-	result = clf.predict(j[0])
-
-	analyseClassification(result,j[1])
+    #dictionary = textMining.readDictionaryFromFile("whole"+dictFilePath)
+    print 'Hey'
+    k = formatExamples(categoryList, trainGroupSize, "TRAIN")
+    print 'Hey'
+    j = formatExamples(categoryList, testGroupSize, "TEST")
+    print 'Hey'
+    clf = tree.DecisionTreeClassifier()
+    clf = clf.fit(k[0], k[1])
+    print 'Hey'
+    result = clf.predict(j[0])
+    analyseClassification(result, j[1])
