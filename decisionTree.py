@@ -14,7 +14,7 @@ dictFilePath = "_dictionary.dat"
 FeaturesFilePath = "_features.dat"
 categoryList = ['tech','sports','religion']
 
-trainGroupSize = 7500
+trainGroupSize = 5000
 testGroupSize = 2500
 #
 
