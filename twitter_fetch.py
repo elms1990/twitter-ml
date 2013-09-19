@@ -5,7 +5,9 @@ import sys
 db = Connection(
     'mongodb://test:test@paulo.mongohq.com:10063/TweetCat').TweetCat
 
-
+# count the number of tweets in a given category
+def count_tweets():
+	return db.tweets.count()
 
 def count_new_tweets():
     return db.tweets.find({'new':True}).count()
@@ -78,28 +80,28 @@ def get_args(argv, opt):
     return -1
 
 if __name__ == '__main__':
-    if len(sys.argv) == 1:
-        print 'USAGE: twitter_test [opt]\n\n\
-       COMMANDS:\n\
-       -add ACCOUNT CATEGORY: Adds a new account to the category.\n\
-       -update: Updates all registered categories.'
-        quit()
+	if len(sys.argv) == 1:
+		print 'USAGE: twitter_test [opt]\n\n\
+		COMMANDS:\n\
+		-add ACCOUNT CATEGORY: Adds a new account to the category.\n\
+		-update: Updates all registered categories.'
+		quit()
+	index = get_args(sys.argv, '-add')
+	if index != -1:
+		acc = sys.argv[index + 1]
+		cat = sys.argv[index + 2]
 
-    index = get_args(sys.argv, '-add')
-    if index != -1:
-        acc = sys.argv[index + 1]
-        cat = sys.argv[index + 2]
+		db.accounts.save({'user': acc, 'cat': cat})
 
-        db.accounts.save({'user': acc, 'cat': cat})
-
-        print 'Account ' +  acc + ' successfully added to category ' + cat
+		print 'Account ' +  acc + ' successfully added to category ' + cat
 
 
-    index = get_args(sys.argv, '-update')
-    if index != -1:
-        download_tweets()
+	index = get_args(sys.argv, '-update')
+	if index != -1:
+		download_tweets()
     
     # para adicionar novas contas rodar: db.accounts.save({'user':NOMEDACONTA,
     # 'cat':NOMEDACATEGORIA})
     #download_tweets()
     # 25801
+

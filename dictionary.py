@@ -1,14 +1,14 @@
 import twitter_fetch
 import textMining
 from nltk.probability import FreqDist
-from math import ceil
+from math import ceil, log
 from random import sample
 
 categoryList = ['sports', 'tech','religion']
 categoryDictFilePath = "_dictionary.dat"
 freqPercentage = 0.9
 nonFreqPercentage = 0.1
-
+nTweets = twitter_fetch.count_tweets()
 
 # buildDictionary() creates the dictionary from the tokens of the tweets from a given <category>
 # Also saves the dictionary to a file
@@ -49,8 +49,8 @@ def updateCategoryDictionary(category):
 def buildWholeDictionary(categoryList, nWords):
     dictList = []
     for category in categoryList:
-        tmpDict = updateCategoryDictionary(category)
-        #tmpDict = buildCategoryDictionary(category)
+        #tmpDict = updateCategoryDictionary(category)
+        tmpDict = buildCategoryDictionary(category)
         dictList.append(tmpDict)
     wholeDictionary = selectNWordsFromDict(dictList, nWords)
     saveDictionaryToFile(wholeDictionary, 'whole' + categoryDictFilePath)
@@ -77,7 +77,7 @@ def selectNWordsFromDict(dictList, nWords):
 	for eachTuple in freqTuples:
 		wholeDictionary[eachTuple[0]] = wholeDictionary[eachTuple[0]] + eachTuple[1]
 	nonFreqTuples = sample(catDict.items()[freqWords:],nonFreqWords) 
-	for eachTuple in nonfreqTuples:
+	for eachTuple in nonFreqTuples:
 		wholeDictionary[eachTuple[0]] = wholeDictionary[eachTuple[0]] + eachTuple[1]
     return wholeDictionary
 
@@ -101,12 +101,17 @@ def readDictionaryFromFile(dictFilePath):
         dictionary[tmp[0]] = int(tmp[1])
     return dictionary
 
-############### ALTERAR DAQUI PRA BAIXO ##################
-
 # extractFeaturesFromTweet() will construct the FV using TF-IDF
 # in: dictionary = FreqDist/list(str), tweet = str, category = str
-def extractFeaturesFromTweet(dictionary, tweet, category):
-	return
+def extractFeaturesFromTweet(dictionary, tweet):
+	featuresVector = []
+	tokenList = textMining.tokenizeTweet(tweet,unique=False)
+	
+	for eachToken in dictionary:
+		tf = float(tokenList.count(eachToken))
+		idf = log(nTweets/dictionary[eachToken])
+		featuresVector.append(tf*idf)	
+	return featuresVector
 
 # extractFeaturesFromAllTweets() extracts the features from all the tweets of categoryList
 # saving them to a file, where each line represents the tokens/features
@@ -119,8 +124,7 @@ def extractFeaturesFromAllTweets(dictionary, categoryList, trainPercentage = 0.0
         tmpList = []
         tweetList = twitter_fetch.get_tweets_text(classn=category)
         for tweet in tweetList:
-            tmpList.append(
-                extractFeaturesFromTweet(dictionary, tweet, category))
+            tmpList.append(extractFeaturesFromTweet(dictionary, tweet))
         classFeatures.append((tmpList, category))
 
     if trainPercentage == 0.0:
@@ -129,7 +133,7 @@ def extractFeaturesFromAllTweets(dictionary, categoryList, trainPercentage = 0.0
                 f.write(str(len(tweetFeaturesList)) + "\n")
                 for tweetFeatures in tweetFeaturesList:
                     for feature in tweetFeatures:
-                        f.write(feature + " ")
+                        f.write(str(feature) + " ")
                     f.write("\n")
     else:
         for (tweetFeaturesList, category) in classFeatures:
@@ -144,11 +148,15 @@ def extractFeaturesFromAllTweets(dictionary, categoryList, trainPercentage = 0.0
                 f.write(str(nTrain) + "\n")
                 for i in range(nTrain):
                     for feature in tweetFeaturesList[i]:
-                        f.write(feature + " ")
+                        f.write(str(feature)  + " ")
                     f.write("\n")
             with open(category + '_TEST_features.dat', 'w') as f:
                 f.write(str(nTest) + "\n")
                 for i in range(nTest):
                     for feature in tweetFeaturesList[i+nTrain]:
-                        f.write(feature + " ")
+                        f.write(str(feature)  + " ")
                     f.write("\n")
+  	
+if __name__ == "__main__":
+	dictionary = buildWholeDictionary(categoryList, 5)
+	extractFeaturesFromAllTweets(dictionary, categoryList)
