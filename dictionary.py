@@ -5,7 +5,8 @@ from math import ceil, log
 from random import sample
 
 categoryList = ['sports', 'tech','religion']
-categoryDictFilePath = "_dictionary.dat"
+DictFVFilePathPREFIX = "dictionaries_features/"
+categoryDictFilePathSUFIX = "_dictionary.dat"
 freqPercentage = 0.9
 nonFreqPercentage = 0.1
 nTweets = twitter_fetch.count_tweets()
@@ -19,7 +20,7 @@ def buildCategoryDictionary(category):
     freq = FreqDist()
     for tweet in tweetList:
         freq.update(word for word in textMining.tokenizeTweet(tweet))
-    saveDictionaryToFile(freq, category + categoryDictFilePath)
+    saveDictionaryToFile(freq, DictFVFilePathPREFIX + category + categoryDictFilePathSUFIX)
     return freq
 
 # updateCategoryDictionary() download new tweets from the server and update the dictionary saved earlier
@@ -34,13 +35,13 @@ def updateCategoryDictionary(category):
         freq.update(word for word in textMining.tokenizeTweet(tweet))
 
     try:
-	oldDict = readDictionaryFromFile(category + categoryDictFilePath)
+	oldDict = readDictionaryFromFile(DictFVFilePathPREFIX + category + categoryDictFilePathSUFIX)
     except:
         newDict = buildCategoryDictionary(category)
         return newDict
 
     oldDict.update(freq)
-    saveDictionaryToFile(oldDict, category + categoryDictFilePath)
+    saveDictionaryToFile(oldDict, DictFVFilePathPREFIX + category + categoryDictFilePathSUFIX)
     return oldDict
 
 # buildWholeDictionary() combines the dictionaries of every category in categoryList
@@ -53,7 +54,7 @@ def buildWholeDictionary(categoryList, nWords):
         tmpDict = buildCategoryDictionary(category)
         dictList.append(tmpDict)
     wholeDictionary = selectNWordsFromDict(dictList, nWords)
-    saveDictionaryToFile(wholeDictionary, 'whole' + categoryDictFilePath)
+    saveDictionaryToFile(wholeDictionary, DictFVFilePathPREFIX + 'whole' + categoryDictFilePathSUFIX)
     return wholeDictionary
 
 # selectNWordsFromDict() receives the FreqDists of each category and samples nWords from it
@@ -129,7 +130,7 @@ def extractFeaturesFromAllTweets(dictionary, categoryList, trainPercentage = 0.0
 
     if trainPercentage == 0.0:
         for (tweetFeaturesList, category) in classFeatures:
-            with open(category + '_features.dat', 'w') as f:
+            with open(DictFVFilePathPREFIX + category + '_features.dat', 'w') as f:
                 f.write(str(len(tweetFeaturesList)) + "\n")
                 for tweetFeatures in tweetFeaturesList:
                     for feature in tweetFeatures:
@@ -144,13 +145,13 @@ def extractFeaturesFromAllTweets(dictionary, categoryList, trainPercentage = 0.0
 	    print nTrain," TRAIN"
 	    print nTest, " TEST"
 
-            with open(category + '_TRAIN_features.dat', 'w') as f:
+            with open(DictFVFilePathPREFIX + category + '_TRAIN_features.dat', 'w') as f:
                 f.write(str(nTrain) + "\n")
                 for i in range(nTrain):
                     for feature in tweetFeaturesList[i]:
                         f.write(str(feature)  + " ")
                     f.write("\n")
-            with open(category + '_TEST_features.dat', 'w') as f:
+            with open(DictFVFilePathPREFIX + category + '_TEST_features.dat', 'w') as f:
                 f.write(str(nTest) + "\n")
                 for i in range(nTest):
                     for feature in tweetFeaturesList[i+nTrain]:
